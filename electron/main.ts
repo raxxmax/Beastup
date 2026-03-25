@@ -31,7 +31,7 @@ const state = {
   processingHelper: null as ProcessingHelper | null,
 
   // View and state management
-  view: "queue" as "queue" | "solutions" | "debug",
+  view: "queue" as "queue" | "solutions" | "debug" | "browser",
   problemInfo: null as any,
   hasDebugged: false,
 
@@ -55,8 +55,8 @@ const state = {
 export interface IProcessingHelperDeps {
   getScreenshotHelper: () => ScreenshotHelper | null
   getMainWindow: () => BrowserWindow | null
-  getView: () => "queue" | "solutions" | "debug"
-  setView: (view: "queue" | "solutions" | "debug") => void
+  getView: () => "queue" | "solutions" | "debug" | "browser"
+  setView: (view: "queue" | "solutions" | "debug" | "browser") => void
   getProblemInfo: () => any
   setProblemInfo: (info: any) => void
   getScreenshotQueue: () => string[]
@@ -78,7 +78,8 @@ export interface IShortcutsHelperDeps {
   getImagePreview: (filepath: string) => Promise<string>
   processingHelper: ProcessingHelper | null
   clearQueues: () => void
-  setView: (view: "queue" | "solutions" | "debug") => void
+  setView: (view: "queue" | "solutions" | "debug" | "browser") => void
+  getView: () => "queue" | "solutions" | "debug" | "browser"
   isVisible: () => boolean
   toggleMainWindow: () => void
   moveWindowLeft: () => void
@@ -99,10 +100,10 @@ export interface IIpcHandlerDeps {
   processingHelper: ProcessingHelper | null
   PROCESSING_EVENTS: typeof state.PROCESSING_EVENTS
   takeScreenshot: () => Promise<string>
-  getView: () => "queue" | "solutions" | "debug"
+  getView: () => "queue" | "solutions" | "debug" | "browser"
   toggleMainWindow: () => void
   clearQueues: () => void
-  setView: (view: "queue" | "solutions" | "debug") => void
+  setView: (view: "queue" | "solutions" | "debug" | "browser") => void
   moveWindowLeft: () => void
   moveWindowRight: () => void
   moveWindowUp: () => void
@@ -111,7 +112,7 @@ export interface IIpcHandlerDeps {
 
 // Initialize helpers
 function initializeHelpers() {
-  state.screenshotHelper = new ScreenshotHelper(state.view)
+  state.screenshotHelper = new ScreenshotHelper(state.view as "queue" | "solutions" | "debug")
   state.processingHelper = new ProcessingHelper({
     getScreenshotHelper,
     getMainWindow,
@@ -136,6 +137,7 @@ function initializeHelpers() {
     processingHelper: state.processingHelper,
     clearQueues,
     setView,
+    getView,
     isVisible: () => state.isWindowVisible,
     toggleMainWindow,
     moveWindowLeft: () =>
@@ -217,6 +219,7 @@ async function createWindow(): Promise<void> {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      webviewTag: true,
       preload: isDev
         ? path.join(__dirname, "../dist-electron/preload.js")
         : path.join(__dirname, "preload.js"),
@@ -617,13 +620,15 @@ function getMainWindow(): BrowserWindow | null {
   return state.mainWindow
 }
 
-function getView(): "queue" | "solutions" | "debug" {
+function getView(): "queue" | "solutions" | "debug" | "browser" {
   return state.view
 }
 
-function setView(view: "queue" | "solutions" | "debug"): void {
+function setView(view: "queue" | "solutions" | "debug" | "browser"): void {
   state.view = view
-  state.screenshotHelper?.setView(view)
+  if (view !== "browser") {
+    state.screenshotHelper?.setView(view)
+  }
 }
 
 function getScreenshotHelper(): ScreenshotHelper | null {

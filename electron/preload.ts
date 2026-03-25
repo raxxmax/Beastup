@@ -236,7 +236,14 @@ const electronAPI = {
       ipcRenderer.removeListener("delete-last-screenshot", subscription)
     }
   },
-  deleteLastScreenshot: () => ipcRenderer.invoke("delete-last-screenshot")
+  deleteLastScreenshot: () => ipcRenderer.invoke("delete-last-screenshot"),
+  onToggleBrowserView: (callback: (show: boolean) => void) => {
+    const subscription = (_: any, show: boolean) => callback(show)
+    ipcRenderer.on("toggle-browser-view", subscription)
+    return () => {
+      ipcRenderer.removeListener("toggle-browser-view", subscription)
+    }
+  }
 }
 
 // Before exposing the API

@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 import Queue from "../_pages/Queue"
 import Solutions from "../_pages/Solutions"
+import BrowserView from "../_pages/BrowserView"
 import { useToast } from "../contexts/toast"
 
 interface SubscribedAppProps {
@@ -17,7 +18,7 @@ const SubscribedApp: React.FC<SubscribedAppProps> = ({
   setLanguage
 }) => {
   const queryClient = useQueryClient()
-  const [view, setView] = useState<"queue" | "solutions" | "debug">("queue")
+  const [view, setView] = useState<"queue" | "solutions" | "debug" | "browser">("queue")
   const containerRef = useRef<HTMLDivElement>(null)
   const { showToast } = useToast()
 
@@ -89,6 +90,13 @@ const SubscribedApp: React.FC<SubscribedAppProps> = ({
   // Listen for events that might switch views or show errors
   useEffect(() => {
     const cleanupFunctions = [
+      window.electronAPI.onToggleBrowserView((show: boolean) => {
+        if (show) {
+          setView("browser")
+        } else {
+          setView("queue")
+        }
+      }),
       window.electronAPI.onSolutionStart(() => {
         setView("solutions")
       }),
@@ -150,6 +158,8 @@ const SubscribedApp: React.FC<SubscribedAppProps> = ({
           currentLanguage={currentLanguage}
           setLanguage={setLanguage}
         />
+      ) : view === "browser" ? (
+        <BrowserView setView={setView} />
       ) : null}
     </div>
   )

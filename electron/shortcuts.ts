@@ -149,6 +149,24 @@ export class ShortcutsHelper {
       }
     })
     
+    // Toggle browser view shortcut
+    globalShortcut.register("CommandOrControl+5", () => {
+      console.log("Command/Ctrl + 5 pressed. Toggling browser view.")
+      const mainWindow = this.deps.getMainWindow()
+      if (mainWindow) {
+        const currentView = this.deps.getView()
+        if (currentView === "browser") {
+          // Switch back to queue view
+          this.deps.setView("queue")
+          mainWindow.webContents.send("toggle-browser-view", false)
+        } else {
+          // Switch to browser view
+          this.deps.setView("browser")
+          mainWindow.webContents.send("toggle-browser-view", true)
+        }
+      }
+    })
+    
     // Delete last screenshot shortcut
     globalShortcut.register("CommandOrControl+L", () => {
       console.log("Command/Ctrl + L pressed. Deleting last screenshot.")
