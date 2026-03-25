@@ -277,7 +277,7 @@ export class ProcessingHelper {
         mainWindow.webContents.send("processing-status", { message: "Generating solution...", progress: 60 });
       }
 
-      const promptText = `Problem: ${problemInfo.problem_statement}\n\nConstraints: ${problemInfo.constraints}\n\nExample Input: ${problemInfo.example_input}\n\nExample Output: ${problemInfo.example_output}\n\nProvide a solution in ${language}. Include:\n1. The complete, working code\n2. Brief explanation of approach\n3. Time and space complexity`;
+    const promptText = `Problem: ${problemInfo.problem_statement}\n\nConstraints: ${problemInfo.constraints}\n\nExample Input: ${problemInfo.example_input}\n\nExample Output: ${problemInfo.example_output}\n\nProvide two solutions in ${language}:\n1. Bruteforce Solution\n2. Optimal Solution\n\nFor each solution, include:\n- The complete, working code\n- Brief explanation of approach\n- Time and space complexity`;
 
       let responseContent;
 
